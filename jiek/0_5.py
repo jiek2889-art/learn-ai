@@ -1,4 +1,4 @@
-num = int(input("请输入一个正整数: "))
+num = int(input())
 end = int(num**0.5)
 is_prime = True
 for i in range(2, end + 1):
