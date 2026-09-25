@@ -121,3 +121,14 @@
 # Path("player2.txt").write_text("\n".join(player2))
 # Path("player3.txt").write_text("\n".join(player3))
 # Path("others.txt").write_text("\n".join(others))
+
+
+# def count_numbers(nums):
+#     counts = {}
+#     for n in nums:
+#         counts[n] = counts.get(n, 0) + 1
+#     return counts
+
+
+# data = [1, 3, 3, 7, 3, 1, 9, 9, 9, 9, 0]
+# print(count_numbers(data))
