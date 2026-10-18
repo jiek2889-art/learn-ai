@@ -125,9 +125,6 @@ class Character:
         else:
             print("无效的礼物。")
 
-        # TODO: 完成礼物好感度逻辑（送出不同礼物加不同的好感度）并调用 change_affinity（）函数 传入此次好感度变化的数值 value
-        pass
-
     def change_affinity(self, value):
         self.affinity += value
         print(f"{self.name} 的好感度变化 {value} -> 当前好感度：{self.affinity}")
