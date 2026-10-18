@@ -1,0 +1,139 @@
+DIALOGUES = {
+    "学姐": [
+        {"text": "你是新来的吧？画画过吗？", "optionA": "其实我更擅长写代码，但我愿意试试画画。", "optionB": "画画？那种小孩子的东西我可没兴趣。"},
+        {
+            "text": "这幅画……构图还算不错，你是随便画的吗？",
+            "optionA": "嗯，我是随手画的，没想到能得到你的认可。",
+            "optionB": "不，我可是很认真的！因为你在看嘛。",
+        },
+        {"text": "加入社团后，不能三天打鱼两天晒网。", "optionA": "放心吧，我会认真对待。", "optionB": "社团只是玩玩而已吧？不要太严肃了。"},
+        {"text": "我平时比较严格，你会不会觉得我很不好相处？", "optionA": "严格才好啊，我喜欢有目标的人。", "optionB": "嗯……确实有点难相处。"},
+        {"text": "今天的社团活动结束了，你要不要和我一起收拾？", "optionA": "当然可以，我来帮你。", "optionB": "算了吧，我还有事要做。"},
+    ],
+    "小白": [
+        {"text": "Python 里的 for 循环，我总是写不对……", "optionA": "来，我教你一个小技巧！", "optionB": "这种简单的东西，你都不会？"},
+        {"text": "你看我借了好多书，会不会显得很傻？", "optionA": "不会啊，这说明你很爱学习，很可爱。", "optionB": "嗯……的确有点太贪心了。"},
+        {"text": "写代码的时候，我总喜欢喝奶茶……你呢？", "optionA": "我也是！来，下次我请你一杯。", "optionB": "我只喝水，健康第一。"},
+        {"text": "你会不会觉得我太依赖你了？", "optionA": "依赖我也没关系，我喜欢这种感觉。", "optionB": "嗯……是有点吧。"},
+        {"text": "要不要一起留在图书馆自习？我想有人陪。", "optionA": "好啊，我正好也要复习。", "optionB": "算了，我还是回宿舍打游戏吧。"},
+    ],
+    "姐姐": [
+        {"text": "你也喜欢在咖啡店看书吗？", "optionA": "是啊，这里很安静，很适合思考。", "optionB": "其实我只是随便找个地方坐。"},
+        {"text": "研究生的生活，其实没有你想象的那么光鲜。", "optionA": "我能理解，压力一定很大吧。", "optionB": "那我还是不要考研了。"},
+        {"text": "你觉得，什么样的人最值得依靠？", "optionA": "稳重冷静的人。", "optionB": "长得好看的人。"},
+        {"text": "我常常一个人坐到很晚，你不会觉得孤单吗？", "optionA": "有时候孤单是种享受。", "optionB": "一个人太寂寞了，我受不了。"},
+        {"text": "如果有一天，我遇到困难，你会帮我吗？", "optionA": "当然会，你不用一个人扛着。", "optionB": "我大概帮不了你吧。"},
+    ],
+}
+
+
+GIFT_EFFECTS = {
+    # 通用 / 默认 值
+    "鲜花": {"学姐": 10, "小白": 10, "姐姐": 15},
+    "编程笔记": {"学姐": 5, "小白": 15, "姐姐": 15},
+    "奶茶": {"学姐": 20, "小白": 20, "姐姐": 20},
+    "奇怪的石头": {"default": -10},  # 所有人 -10
+    "精致的钢笔": {"学姐": 20, "小白": 10, "姐姐": 20},
+    "可爱玩偶": {"学姐": 10, "小白": 20, "姐姐": 10},
+    "夜宵外卖": {"学姐": 0, "小白": 5, "姐姐": -5},
+}
+BLOCKS = {
+    "prologue": [
+        {"type": "narration", "text": "你是一名刚刚踏入大学校园的新生。"},
+        {"type": "narration", "text": "在开学典礼上，拿下压倒性成绩第一的你被选为新生代表发言。"},
+        {"type": "narration", "text": "在全场上千人的注视下，你气质非凡，发言流畅，很快成为焦点人物。"},
+        {"type": "narration", "text": "消息迅速传开，关于‘神秘新生代表’的讨论充斥着整个校园。"},
+        {"type": "narration", "text": "于是，在这个新的舞台上，你与三位不同的女生产生了交集……"},
+    ],
+    "scene_senpai": [
+        {"type": "narration", "text": "你路过社团活动室，学姐正拿着画板注意到你。"},
+        {"type": "dialogue", "character": "学姐", "text": "这位新生？要不要来试试？"},
+        {"type": "choice", "options": [{"text": "主动表现兴趣，拿起一只笔作画"}, {"text": "表示抱歉，没兴趣，转身离开"}]},
+        {"type": "narration", "text": "你随手挑起一只笔，在纸上几笔勾勒出惊艳的图案，引得周围阵阵惊呼。"},
+        {"type": "dialogue", "character": "学姐", "text": "目光一震，眼神变得格外认真。你进入【学姐线】！"},
+        {"type": "dialogue", "text": "在纵目睽睽下，你扬长而去。"},
+        {"type": "set_target", "character": "学姐"},
+    ],
+    "senpai_xiaobai": [
+        {"type": "narration", "text": "你走进图书馆，发现小白正在奋笔疾书，却被一道算法题难住了。"},
+        {"type": "dialogue", "character": "小白", "text": "呜呜……这题到底该怎么写呀？"},
+        {
+            "type": "choice",
+            "options": [{"text": "主动帮她解题", "next_block": "xiaobai_help"}, {"text": "敷衍几句，转身离开", "next_block": "xiaobai_decline"}],
+        },
+        {"type": "dialogue", "text": "小白失望地看着你离开，继续埋头苦读。"},
+        {"type": "narration", "text": "你耐心地为小白讲解算法思路，她的眼睛闪烁着光芒。"},
+        {"type": "dialogue", "character": "小白", "text": "感激地看着你，决定与你一起学习。你进入【小白线】！"},
+        {"type": "set_target", "character": "小白"},
+    ],
+    "senpai_jiejie": [
+        {"type": "narration", "text": "你偶然在校外的咖啡店敲代码，一位看起来成熟知性的姐姐似乎对你感兴趣，缓缓朝你走了过来..."},
+        {"type": "dialogue", "character": "姐姐", "text": "你的代码思路很有趣呢，能给我讲讲你的实现方法吗？"},
+        {"type": "choice", "options": [{"text": "主动分享你的实现方法"}, {"text": "表示不好意思，拒绝分享"}]},
+        {"type": "dialogue", "text": "姐姐略显失望，但还是礼貌地点头告别。"},
+        {"type": "narration", "text": "你详细地向姐姐解释了你的实现方法，她认真倾听并提出了一些建设性的意见。"},
+        {"type": "dialogue", "character": "姐姐", "text": "你真是个有才华的人，我很欣赏你。你进入【姐姐线】！"},
+        {"type": "set_target", "character": "姐姐"},
+    ],
+}
+
+
+class Character:
+    def __init__(self, name, role, affinity=0):
+        self.name = name
+        self.role = role
+        self.affinity = affinity
+
+    def talk(self):
+        print(f"你正在和{self.name}对话...")
+        if self.name in DIALOGUES:
+            dialogue = DIALOGUES[self.name]
+            if self.affinity < 20:
+                index = 0
+            elif self.affinity < 40:
+                index = 1
+            elif self.affinity < 60:
+                index = 2
+            elif self.affinity < 80:
+                index = 3
+            else:
+                index = 4
+
+            print(dialogue[index]["text"])
+            print(f"选项A: {dialogue[index]['optionA']}")
+            print(f"选项B: {dialogue[index]['optionB']}")
+            choice = input("请选择 A 或 B：")
+            if choice.upper() == "A":  # .upper() 将字符串转换为大写,没有就会报错，报错信息是 AttributeError: 'str' object has no attribute 'upper'2
+                self.change_affinity(10)
+            elif choice.upper() == "B":
+                self.change_affinity(-5)
+            else:
+                print("无效输入")
+
+        # TODO: 补充具体对话，对话内容可以从剧本里面截取 根据主人公的不同，使用不同的对话（你也可以根据好感度的不同/对话次数的不同 改变对话和选项）
+
+    def give_gift(self, gift):
+        print(f"你送给 {self.name} 一份 {gift}。")
+        if gift in GIFT_EFFECTS:
+            effects = GIFT_EFFECTS[gift]
+            if self.name in effects:
+                self.change_affinity(effects[self.name])
+            elif "default" in effects:
+                self.change_affinity(effects["default"])
+            else:
+                self.change_affinity(0)
+        else:
+            print("无效的礼物。")
+
+        # TODO: 完成礼物好感度逻辑（送出不同礼物加不同的好感度）并调用 change_affinity（）函数 传入此次好感度变化的数值 value
+        pass
+
+    def change_affinity(self, value):
+        self.affinity += value
+        print(f"{self.name} 的好感度变化 {value} -> 当前好感度：{self.affinity}")
+
+    def check_ending(self):
+        if self.affinity >= 100:
+            print(f"恭喜！你和 {self.name} 的故事进入了结局线！")
+            return True
+        return False

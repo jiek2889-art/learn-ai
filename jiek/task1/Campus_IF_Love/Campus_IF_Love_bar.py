@@ -9,12 +9,45 @@ class Character:
 
     def talk(self):
         print(f"你正在和{self.name}对话...")
+        if self.name in DIALOGUES:
+            dialogue = DIALOGUES[self.name]
+            if self.affinity < 20:
+                index = 0
+            elif self.affinity < 40:
+                index = 1
+            elif self.affinity < 60:
+                index = 2
+            elif self.affinity < 80:
+                index = 3
+            else:
+                index = 4
+
+            print(dialogue[index]["text"])
+            print(f"选项A: {dialogue[index]['optionA']}")
+            print(f"选项B: {dialogue[index]['optionB']}")
+            choice = input("请选择 A 或 B：")
+            if choice.upper() == "A":  # .upper() 将字符串转换为大写,没有就会报错，报错信息是 AttributeError: 'str' object has no attribute 'upper'2
+                self.change_affinity(10)
+            elif choice.upper() == "B":
+                self.change_affinity(-5)
+            else:
+                print("无效输入")
 
         # TODO: 补充具体对话，对话内容可以从剧本里面截取 根据主人公的不同，使用不同的对话（你也可以根据好感度的不同/对话次数的不同 改变对话和选项）
-        self.change_affinity(5)
 
     def give_gift(self, gift):
         print(f"你送给 {self.name} 一份 {gift}。")
+        if gift in GIFT_EFFECTS:
+            effects = GIFT_EFFECTS[gift]
+            if self.name in effects:
+                self.change_affinity(effects[self.name])
+            elif "default" in effects:
+                self.change_affinity(effects["default"])
+            else:
+                self.change_affinity(0)
+        else:
+            print("无效的礼物。")
+
         # TODO: 完成礼物好感度逻辑（送出不同礼物加不同的好感度）并调用 change_affinity（）函数 传入此次好感度变化的数值 value
         pass
 
@@ -75,17 +108,36 @@ class Game:
         print("小白：『呜呜……这题到底该怎么写呀？』")
 
         choice = input("1. 主动帮她解题\n2. 敷衍几句，转身离开\n请选择：")
+        if choice == "1":
+            print("\n你耐心地为小白讲解算法思路，她的眼睛闪烁着光芒。")
+            print("小白感激地看着你，决定与你一起学习。你进入【小白线】！")
+            self.current_target = self.characters["小白"]
+            self.story_loop()
+            return True
+        else:
+            print("小白失望地看着你离开，继续埋头苦读。")
+            return False
+
         # TODO 两种选择 如果选择了 1 则进入该位角色的故事线 并返回 True 如果选择了 2 则进入下一位角色的选择 并且返回 False
         # 注意 除了判断外 你可以同时输出角色的反应
         # 比如在上一位角色的判断中 选择了 1 时 输出了 print("\n你随手挑起一只笔，在纸上几笔勾勒出惊艳的图案，引得周围阵阵惊呼。")
         # 写法可以借鉴学姐线
 
     def scene_jiejie(self):
-        print("\n【场景三：姐姐")
+        print("\n【场景三：姐姐】")
         print("你偶然在校外的咖啡店敲代码，一位看起来成熟知性的姐姐似乎对你感兴趣，缓缓朝你走了过来...")
         print("姐姐：『你的代码思路很有趣呢，能给我讲讲你的实现方法吗？』")
 
         choice = input("1. 缓缓低眉，毫不在意的开始解释\n2. 头也不抬，保持敲代码的状态\n请选择：")
+        if choice == "1":
+            print("\n你耐心地为姐姐讲解代码实现，她的内心受到触动。")
+            print("姐姐微笑着点头，决定与你一起探讨更多编程问题。你进入【姐姐线】！")
+            self.current_target = self.characters["姐姐"]
+            self.story_loop()
+            return True
+        else:
+            print("姐姐嫌弃地看着你，轻轻叹了口气离开。")
+            return False
         # TODO 两种选择 如果选择了 1 则进入该位角色的故事线 并返回 True 如果选择了 2 则进入下一位角色的选择 并且返回 False
         # 要求同上
 
@@ -99,6 +151,13 @@ class Game:
             print("4. 离开（退出游戏）")
 
             choice = input("请输入选项：")
+            if choice == "1":
+                self.current_target.talk()
+            elif choice == "2":
+                gift = input("请输入你要送的礼物（鲜花、编程笔记、奶茶、奇怪的石头、精致的钢笔、可爱玩偶、夜宵外卖）：")
+                self.current_target.give_gift(gift)
+            elif choice == "3":
+                print(f"{self.current_target.name} 的当前好感度：{self.current_target.affinity}")  # 类的调用 直接调用属性
 
             # TODO 完成输入不同选项时 进行的操作
 
@@ -108,7 +167,7 @@ class Game:
 
             # 输入 3----
 
-            if choice == "4":
+            elif choice == "4":
                 print("你选择离开，游戏结束。")
                 sys.exit(0)
 
