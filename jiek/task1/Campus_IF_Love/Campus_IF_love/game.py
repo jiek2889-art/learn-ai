@@ -1,8 +1,10 @@
 import sys
-from story import DIALOGUES, GIFT_EFFECTS, Character
+from story import BLOCKS, DIALOGUES, GIFT_EFFECTS, Character
 from manage import SaveManager
 
 
+#     reference from chatgpy
+#     根据chatgpt,进行了修改
 class Game:
     def __init__(self) -> None:
         self.characters = {
@@ -14,25 +16,47 @@ class Game:
         self.current_target = self.characters["None"]
         self.save_manager = SaveManager("save_data.json")
         self.scene_index = 1
+        self.current_block = "prologue"
+        self.current_line = 0
 
-    def save_game(self) -> None:
+    def save_game(self, show_message: bool = True) -> None:
         """保存当前剧情进度和所有角色的好感度。"""
         data = {
             "scene_index": self.scene_index,
+            "current_block": self.current_block,
+            "current_line": self.current_line,
             "current_target": self.current_target.name,
             "affinity": {name: character.affinity for name, character in self.characters.items() if name != "None"},
         }
         self.save_manager.save(data)
-        print("游戏已保存。")
+        if show_message:
+            print("游戏已保存。")
 
     def load_game(self) -> bool:
-        """读取存档；读取成功返回 True。"""
+        """读取存档"""
         data = self.save_manager.load()
         if data is None:
             print("没有找到存档。")
             return False
 
         self.scene_index = int(data.get("scene_index", 1))
+
+        saved_block = data.get("current_block")
+        if saved_block in BLOCKS:
+            self.current_block = saved_block
+            saved_line = int(data.get("current_line", 0))
+            self.current_line = max(0, min(saved_line, len(BLOCKS[saved_block])))
+        else:
+            legacy_blocks = {
+                1: ("prologue", 0),
+                2: ("scene_xiaobai", 0),
+                3: ("scene_jiejie", 0),
+                4: ("scene_jiejie", len(BLOCKS["scene_jiejie"])),
+            }
+            self.current_block, self.current_line = legacy_blocks.get(
+                self.scene_index,
+                ("prologue", 0),
+            )
 
         for name, affinity in data.get("affinity", {}).items():
             if name in self.characters:
@@ -47,13 +71,76 @@ class Game:
         print("存档读取成功。")
         return True
 
+    def play_block(self, block_name: str) -> str | None:
+        """执行一个 BLOCKS 剧情块，并返回选择后的下一个剧情块。"""
+        if block_name not in BLOCKS:
+            raise ValueError(f"不存在的剧情块：{block_name}")
+
+        if self.current_block != block_name:
+            self.current_block = block_name
+            self.current_line = 0
+
+        block = BLOCKS[block_name]
+
+        while self.current_line < len(block):
+            item = block[self.current_line]
+            item_type = item.get("type")
+
+            if item_type == "narration":
+                print(item["text"])
+
+            elif item_type == "dialogue":
+                character = item.get("character")
+                if character:
+                    print(f"{character}：『{item['text']}』")
+                else:
+                    print(item["text"])
+
+            elif item_type == "choice":
+                options = item.get("options", [])
+                for number, option in enumerate(options, start=1):
+                    print(f"{number}. {option['text']}")
+
+                while True:
+                    choice = input("请选择：").strip()
+                    if choice.isdigit() and 1 <= int(choice) <= len(options):
+                        selected = options[int(choice) - 1]
+                        break
+                    print("无效输入，请重新选择。")
+
+                next_block = selected.get("next_block")
+                self.current_line += 1
+                if next_block is not None:
+                    self.current_block = next_block
+                    self.current_line = 0
+                    self.save_game(show_message=False)
+                    return next_block
+
+                self.save_game(show_message=False)
+                continue
+
+            elif item_type == "set_target":
+                character_name = item.get("character")
+                if character_name in self.characters:
+                    self.current_target = self.characters[character_name]
+
+            self.current_line += 1
+            self.save_game(show_message=False)
+
+        return None
+
+    def run_scene_blocks(self, start_block: str, block_names: set[str]) -> None:
+        """从当前存档位置继续执行指定场景相关的剧情块。"""
+        if self.current_block in block_names:
+            block_name = self.current_block
+        else:
+            block_name = start_block
+
+        while block_name is not None:
+            block_name = self.play_block(block_name)
+
     def start(self) -> None:
         print("========== 游戏开始：校园 if·恋 ==========")
-        print("你是一名刚刚踏入大学校园的新生。")
-        print("在开学典礼上，拿下压倒性成绩第一的你被选为新生代表发言。")
-        print("在全场上千人的注视下，你气质非凡，发言流畅，很快成为焦点人物。")
-        print("消息迅速传开，关于‘神秘新生代表’的讨论充斥着整个校园。")
-        print("于是，在这个新的舞台上，你与三位不同的女生产生了交集……")
 
         save_data = self.save_manager.load()
         if save_data is not None:
@@ -63,6 +150,9 @@ class Game:
                 if self.current_target != self.characters["None"]:
                     self.story_loop()
                     return
+
+        if self.current_block == "prologue":
+            self.play_block("prologue")
 
         if self.scene_index <= 1:
             if self.scene_senpai():
@@ -85,61 +175,39 @@ class Game:
 
     def scene_senpai(self) -> bool:
         print("\n【场景一：社团学姐】")
-        print("你路过社团活动室，学姐正拿着画板注意到你。")
-        print("学姐：『这位新生？要不要来试试？』")
+        self.run_scene_blocks(
+            "scene_senpai",
+            {"scene_senpai", "senpai_accept", "senpai_decline"},
+        )
 
-        choice = input("1. 主动表现兴趣，拿起一只笔作画\n2. 表示抱歉，没兴趣，转身离开\n请选择：")
-        if choice == "1":
-            print("\n你随手挑起一只笔，在纸上几笔勾勒出惊艳的图案，引得周围阵阵惊呼。")
-            print("学姐目光一震，眼神变得格外认真。你进入【学姐线】！")
-            self.current_target = self.characters["学姐"]
-            self.save_game()
+        if self.current_target != self.characters["None"]:
             self.story_loop()
             return True
-        else:
-            print("在纵目睽睽下，你扬长而去。")
-            return False
+        return False
 
     def scene_xiaobai(self) -> bool:
         print("\n【场景二：小白】")
-        print("你走进图书馆，发现小白正在奋笔疾书，却被一道算法题难住了。")
-        print("小白：『呜呜……这题到底该怎么写呀？』")
+        self.run_scene_blocks(
+            "scene_xiaobai",
+            {"scene_xiaobai", "xiaobai_accept", "xiaobai_decline"},
+        )
 
-        choice = input("1. 主动帮她解题\n2. 敷衍几句，转身离开\n请选择：")
-        if choice == "1":
-            print("\n你耐心地为小白讲解算法思路，她的眼睛闪烁着光芒。")
-            print("小白感激地看着你，决定与你一起学习。你进入【小白线】！")
-            self.current_target = self.characters["小白"]
-            self.save_game()
+        if self.current_target != self.characters["None"]:
             self.story_loop()
             return True
-        else:
-            print("小白失望地看着你离开，继续埋头苦读。")
-            return False
-
-        # TODO 两种选择 如果选择了 1 则进入该位角色的故事线 并返回 True 如果选择了 2 则进入下一位角色的选择 并且返回 False
-        # 注意 除了判断外 你可以同时输出角色的反应
-        # 比如在上一位角色的判断中 选择了 1 时 输出了 print("\n你随手挑起一只笔，在纸上几笔勾勒出惊艳的图案，引得周围阵阵惊呼。")
-        # 写法可以借鉴学姐线
+        return False
 
     def scene_jiejie(self) -> bool:
         print("\n【场景三：姐姐】")
-        print("你偶然在校外的咖啡店敲代码，一位看起来成熟知性的姐姐似乎对你感兴趣，缓缓朝你走了过来...")
-        print("姐姐：『你的代码思路很有趣呢，能给我讲讲你的实现方法吗？』")
+        self.run_scene_blocks(
+            "scene_jiejie",
+            {"scene_jiejie", "jiejie_accept", "jiejie_decline"},
+        )
 
-        choice = input("1. 缓缓低眉，毫不在意的开始解释\n2. 头也不抬，保持敲代码的状态\n请选择：")
-        if choice == "1":
-            print("\n你耐心地为姐姐讲解代码实现，她的内心受到触动。")
-            print("姐姐微笑着点头，决定与你一起探讨更多编程问题。你进入【姐姐线】！")
-            self.current_target = self.characters["姐姐"]
-            self.save_game()
+        if self.current_target != self.characters["None"]:
             self.story_loop()
             return True
-        else:
-            print("姐姐嫌弃地看着你，轻轻叹了口气离开。")
-            return False
-        # TODO 两种选择 如果选择了 1 则进入该位角色的故事线 并返回 True 如果选择了 2 则进入下一位角色的选择 并且返回 False
-        # 要求同上
+        return False
 
     def story_loop(self) -> None:
         """角色线主循环"""

@@ -48,43 +48,70 @@ BLOCKS = {
     "scene_senpai": [
         {"type": "narration", "text": "你路过社团活动室，学姐正拿着画板注意到你。"},
         {"type": "dialogue", "character": "学姐", "text": "这位新生？要不要来试试？"},
-        {"type": "choice", "options": [{"text": "主动表现兴趣，拿起一只笔作画"}, {"text": "表示抱歉，没兴趣，转身离开"}]},
+        {
+            "type": "choice",
+            "options": [
+                {"text": "主动表现兴趣，拿起一只笔作画", "next_block": "senpai_accept"},
+                {"text": "表示抱歉，没兴趣，转身离开", "next_block": "senpai_decline"},
+            ],
+        },
+    ],
+    "senpai_accept": [
         {"type": "narration", "text": "你随手挑起一只笔，在纸上几笔勾勒出惊艳的图案，引得周围阵阵惊呼。"},
         {"type": "dialogue", "character": "学姐", "text": "目光一震，眼神变得格外认真。你进入【学姐线】！"},
-        {"type": "dialogue", "text": "在纵目睽睽下，你扬长而去。"},
         {"type": "set_target", "character": "学姐"},
     ],
-    "senpai_xiaobai": [
+    "senpai_decline": [
+        {"type": "dialogue", "text": "在纵目睽睽下，你扬长而去。"},
+    ],
+    "scene_xiaobai": [
         {"type": "narration", "text": "你走进图书馆，发现小白正在奋笔疾书，却被一道算法题难住了。"},
         {"type": "dialogue", "character": "小白", "text": "呜呜……这题到底该怎么写呀？"},
         {
             "type": "choice",
-            "options": [{"text": "主动帮她解题", "next_block": "xiaobai_help"}, {"text": "敷衍几句，转身离开", "next_block": "xiaobai_decline"}],
+            "options": [
+                {"text": "主动帮她解题", "next_block": "xiaobai_accept"},
+                {"text": "敷衍几句，转身离开", "next_block": "xiaobai_decline"},
+            ],
         },
-        {"type": "dialogue", "text": "小白失望地看着你离开，继续埋头苦读。"},
+    ],
+    "xiaobai_accept": [
         {"type": "narration", "text": "你耐心地为小白讲解算法思路，她的眼睛闪烁着光芒。"},
         {"type": "dialogue", "character": "小白", "text": "感激地看着你，决定与你一起学习。你进入【小白线】！"},
         {"type": "set_target", "character": "小白"},
     ],
-    "senpai_jiejie": [
+    "xiaobai_decline": [
+        {"type": "dialogue", "text": "小白失望地看着你离开，继续埋头苦读。"},
+    ],
+    "scene_jiejie": [
         {"type": "narration", "text": "你偶然在校外的咖啡店敲代码，一位看起来成熟知性的姐姐似乎对你感兴趣，缓缓朝你走了过来..."},
         {"type": "dialogue", "character": "姐姐", "text": "你的代码思路很有趣呢，能给我讲讲你的实现方法吗？"},
-        {"type": "choice", "options": [{"text": "主动分享你的实现方法"}, {"text": "表示不好意思，拒绝分享"}]},
-        {"type": "dialogue", "text": "姐姐略显失望，但还是礼貌地点头告别。"},
+        {
+            "type": "choice",
+            "options": [
+                {"text": "主动分享你的实现方法", "next_block": "jiejie_accept"},
+                {"text": "表示不好意思，拒绝分享", "next_block": "jiejie_decline"},
+            ],
+        },
+    ],
+    "jiejie_accept": [
         {"type": "narration", "text": "你详细地向姐姐解释了你的实现方法，她认真倾听并提出了一些建设性的意见。"},
         {"type": "dialogue", "character": "姐姐", "text": "你真是个有才华的人，我很欣赏你。你进入【姐姐线】！"},
         {"type": "set_target", "character": "姐姐"},
+    ],
+    "jiejie_decline": [
+        {"type": "dialogue", "text": "姐姐略显失望，但还是礼貌地点头告别。"},
     ],
 }
 
 
 class Character:
-    def __init__(self, name, role, affinity=0):
+    def __init__(self, name, role, affinity=0) -> None:
         self.name = name
         self.role = role
         self.affinity = affinity
 
-    def talk(self):
+    def talk(self) -> None:
         print(f"你正在和{self.name}对话...")
         if self.name in DIALOGUES:
             dialogue = DIALOGUES[self.name]
@@ -112,7 +139,7 @@ class Character:
 
         # TODO: 补充具体对话，对话内容可以从剧本里面截取 根据主人公的不同，使用不同的对话（你也可以根据好感度的不同/对话次数的不同 改变对话和选项）
 
-    def give_gift(self, gift):
+    def give_gift(self, gift) -> None:
         print(f"你送给 {self.name} 一份 {gift}。")
         if gift in GIFT_EFFECTS:
             effects = GIFT_EFFECTS[gift]
@@ -125,11 +152,11 @@ class Character:
         else:
             print("无效的礼物。")
 
-    def change_affinity(self, value):
+    def change_affinity(self, value) -> None:
         self.affinity += value
         print(f"{self.name} 的好感度变化 {value} -> 当前好感度：{self.affinity}")
 
-    def check_ending(self):
+    def check_ending(self) -> bool:
         if self.affinity >= 100:
             print(f"恭喜！你和 {self.name} 的故事进入了结局线！")
             return True
